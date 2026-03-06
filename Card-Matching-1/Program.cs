@@ -4,9 +4,6 @@ Card card = new Card();
 card.CardSetting();
 card.ShowBoard();
 
-//GameBoard gameBoard = new GameBoard();
-
-
 
 class Card
 {
