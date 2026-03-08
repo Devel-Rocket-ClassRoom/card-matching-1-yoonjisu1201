@@ -1,65 +1,62 @@
 using System;
 using System.Threading.Channels;
-Card card = new Card();
-card.CardSetting();
-card.ShowBoard();
+
+
+Console.WriteLine();
+Card card1 = new Card(3, 4);
+GameBoard board = new GameBoard();
+card1.RandomCard();
+foreach (var item in card1.Deck)
+{
+    Console.Write($"{item} ");
+}
+Console.WriteLine();
+board.ShowBoard(card1);
 
 
 class Card
 {
-    public int[] cardDeck;
-    public int[] cardDeck2;
+    public string[] Deck { get; set; }
+    public int Row { get; }
+    public int Col { get; }
 
-    Random rnd = new Random();
-    public void CardSetting()
+    public Card(int scale1, int scale2)
     {
-        cardDeck = new int[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8 };
-        cardDeck2 = new int[16];
-
-        for (int i = 0; i < 16; i++)
+        Deck = new string[scale1 * scale2];
+        Row = scale1;
+        Col = scale2;
+        for (int i = 0; i < Deck.Length / 2; i++)
         {
-            int index = rnd.Next(0, 16);
-            int temp = cardDeck[i];
-            cardDeck[i] = cardDeck[index];
-            cardDeck[index] = temp;
+            Deck[i * 2] = $"{i + 1}";
+            Deck[i * 2 + 1] = $"{i + 1}";
         }
     }
-    public void ShowBoard()
+    public void RandomCard()
     {
-        Console.WriteLine($"\t1열\t2열\t3열\t4열");
-        for (int i = 0; i < cardDeck.Length; i++)
+        //랜덤으로 카드 섞기 기능
+        Random random = new Random();
+        for (int i = 0; i < Deck.Length; i++)
         {
-            if (cardDeck[i] == cardDeck2[i])
-            {
-                Console.Write($"\t[{cardDeck[i]}]");
-            }
-            else
-            {
-                Console.Write($"\t**");
-            }
-
-            if ((i + 1) % 4 == 0)
-            {
-                Console.WriteLine();
-            }
+            int index = random.Next(0, Deck.Length);
+            string temp = Deck[i];
+            Deck[i] = Deck[index];
+            Deck[index] = temp;
         }
     }
+}
 
-   public void CardSelect()
+class GameBoard
+{
+
+    public void ShowBoard(Card card)
     {
-        while (true)
+        for (int i = 0; i < card.Row; i++)
         {
-            Console.Write("첫 번째 카드를 선택하세요 (행 열): ");
-            string value = Console.ReadLine();
-            if (Convert.ToInt32(value) >= 10)
+            for (int j = 0; j < card.Col; j++)
             {
-                Console.WriteLine("행과 열을 공백으로 구분하여 입력하세요. (예: 1 3)");
-                continue;
+                Console.Write(card.Deck[i]);
             }
-            else if (true)
-            {
-                
-            }
+            Console.WriteLine();
         }
     }
 }
