@@ -42,19 +42,6 @@ class Card   // 카드 정보 클래스
 
 class GameBoard   // 게임보드 출력 클래스
 {
-    public GameBoard(int scale1, int scale2)
-    {
-        Console.WriteLine($"\t1열\t2열\t3열\t4열");
-        for (int i = 0; i < scale1; i++)
-        {
-            Console.Write($"{i + 1}행\t");
-            for (int j = 0; j < scale2; j++)
-            {
-                Console.Write($" **\t");
-            }
-            Console.WriteLine();
-        }
-    }
     public void ShowBoard(Card card)
     {
         Console.WriteLine($"\t1열\t2열\t3열\t4열");
@@ -66,7 +53,7 @@ class GameBoard   // 게임보드 출력 클래스
                 int index = i * 4 + j;
                 if (card.isFlipped[index] == true)
                 {
-                    Console.Write($" {card.Deck[index]}\t");
+                    Console.Write($" [{card.Deck[index]}]\t");
                 }
                 else
                 {
@@ -75,6 +62,7 @@ class GameBoard   // 게임보드 출력 클래스
             }
             Console.WriteLine();
         }
+        Console.WriteLine();
     }
 }
 
@@ -82,6 +70,8 @@ class PlayManager : GameBoard   // 게임 플레이 관련 : 카드 뽑기 메�
 {
     private int TryCount;
     private int MatchCount;
+    private int Max_TryCount;
+    private int Max_MatchCount;
     public int FirstCard_index { get; private set; }
     public int SecondCard_index { get; private set; }
     public string FirstCard { get; private set; }
@@ -89,15 +79,32 @@ class PlayManager : GameBoard   // 게임 플레이 관련 : 카드 뽑기 메�
     private Card card;
     private GameBoard board;
 
-    public PlayManager(int scale1, int scale2) : base(scale1, scale2)
+    public PlayManager(int scale1, int scale2)
     {
         card = new Card(scale1, scale2);
+        board = new GameBoard();
+        card.RandomCard();
+        Max_MatchCount = card.Deck.Length / 2;
     }
     public void Playing()
     {
-        FlipCard(card);
-        CheckForMatch();
-        board.ShowBoard(card);
+        //현재 진행상황 테스트 출력중
+        while (true)
+        {
+            board.ShowBoard(card);
+            FlipCard(card);
+            CheckForMatch();
+            if (TryCount >= 10)
+            {
+                break;
+            }
+            else if (MatchCount == Max_MatchCount)
+            {
+                break;
+            }
+   
+
+        }
     }
 
 
@@ -121,22 +128,23 @@ class PlayManager : GameBoard   // 게임 플레이 관련 : 카드 뽑기 메�
 
                 if (value.Length == 2 && int.TryParse(value[0], out int row) && int.TryParse(value[1], out int col))
                 {
-                    if ((row <= card.Row || row >= 1) && (col <= card.Col || col >= 1))
+                    if ((row <= card.Row && row >= 1) || (col <= card.Col && col >= 1))
                     {
                         int index = (row - 1) * 4 + (col - 1);
                         if (i == 0)
                         {
                             FirstCard = card.Deck[index];
-                            //FirstCard_index = index;
                             card.isFlipped[index] = true;
                             board.ShowBoard(card);
+                            Console.WriteLine($"시도 횟수: {TryCount}/{Max_TryCount} | 찾은 쌍: {MatchCount}/{Max_MatchCount}");
+
                         }
                         else
                         {
                             SecondCard = card.Deck[index];
-                            //SecondCard_index = index;
                             card.isFlipped[index] = true;
                             board.ShowBoard(card);
+                            Console.WriteLine($"시도 횟수: {TryCount}/{Max_TryCount} | 찾은 쌍: {MatchCount}/{Max_MatchCount}");
                         }
                         break;
                     }
@@ -162,13 +170,13 @@ class PlayManager : GameBoard   // 게임 플레이 관련 : 카드 뽑기 메�
         {
             TryCount++;
             MatchCount++;
-            card.isFlipped[FirstCard_index] = true;
-            card.isFlipped[SecondCard_index] = true;
             Console.WriteLine("짝을 찾았습니다!");
         }
         else
         {
             TryCount++;
+            card.isFlipped[FirstCard_index] = false;
+            card.isFlipped[SecondCard_index] = false;
             Console.WriteLine("짝이 맞지 않습니다!");
         }
         FirstCard = string.Empty;
